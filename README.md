@@ -45,3 +45,7 @@ Stellaris Profile Viewer is licensed under the Unlicense, meaning it is released
 ## Acknowledgments
 
 Full disclosure, this app was created with heavy assistance from ChatGPT, an AI language model developed by OpenAI. Mostly to just experiment with AI-assisted development.
+
+## Code Quality
+
+Questionable. It's AI generated after all.
