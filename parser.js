@@ -1,86 +1,64 @@
 function parse_line(line, stack, i) {
   try {
-    const match = line.match(/^(\s*)(.+)$/);
-    if (!match) {
-      throw new Error(`Unable to parse line:\n${line}`);
+    let num_spaces = line.match(/^\s*/)[0].length;
+    let value = line.match(/^\s*\S+/)[0];
+    line = line.slice(value.length).trim();
+
+    let operation = '';
+    let root_pct = NaN;
+    let parent_pct = NaN;
+    let other_pct = NaN;
+    let total_time = NaN;
+    let hits = null;
+    let average = null;
+
+    while (!value.endsWith('%') && line.length > 0) {
+      operation += value;
+      value = line.match(/^\s*\S+/)[0];
+      line = line.slice(value.length).trim();
     }
 
-    const num_spaces = match[1].length;
-    line = match[2].trim();
+    operation = operation.trim();
+    if (operation === '') {
+      operation = '(Unknown)';
+    }
+    root_pct = parseFloat(value) / 100;
 
+    const [parent_pct_str, other_pct_str, total_time_str, hits_str, average_str] = line.split(/\s+/);
+
+    // Get the remaining values
+    parent_pct = parseFloat(parent_pct_str.replace('%', '')) / 100;
+    other_pct = parseFloat(other_pct_str.replace('%', '')) / 100;
+    total_time = parseFloat(total_time_str.replace('ms', ''));
+    hits = parseInt(hits_str);
+    average = average_str ? parseFloat(average_str) : null;
+
+    // Handle stack
     let parent_index = null;
-
-    if (line) {
-      let parts = line
-        .split(' ')
-        .map((part) => part.trim())
-        .filter((part) => part);
-
-      if (parts.length < 4 || parts.length > 6) {
-        throw new Error(`Expected 4, 5, or 6 parts, got ${parts.length}:\n${JSON.stringify(parts)}`);
+    if (operation !== '(Unknown)') {
+      stack_top = stack[stack.length - 1];
+      while (stack.length > 0 && stack_top?.[0] >= num_spaces) {
+        stack.pop();
+        stack_top = stack[stack.length - 1];
       }
 
-      if (parts.length < 6) {
-        if (!parts.length) {
-          return null;
-        }
-
-        return _handle_missing_operation(line, stack, i, parts);
+      if (stack_top) {
+        parent_index = stack_top[1];
       }
-
-      let [operation] = line.split(/\s{2,}/);
-      parts = line
-        .slice(operation.length)
-        .split(/\s+/g)
-        .map((part) => part.trim())
-        .filter((part) => part);
-
-      if (parts.length !== 4 && parts.length !== 5) {
-        throw new Error(`Expected 4 or 5 parts, got ${parts.length}:\n${JSON.stringify(parts)}`);
-      }
-
-      let root_pct = NaN;
-      let parent_pct = NaN;
-      let other_pct = NaN;
-      let total_time = NaN;
-      let hits = NaN;
-      let average = NaN;
-
-      try {
-        if (operation.replace('.', '').match(/^\d+$/) || operation.replace('%', '').replace('.', '').match(/^\d+$/)) {
-          throw new Error(`Invalid operation name: ${operation}`);
-        }
-
-        root_pct = parseFloat(parts[0].replace('%', '')) / 100;
-        parent_pct = parseFloat(parts[1].replace('%', '')) / 100;
-        other_pct = parseFloat(parts[2].replace('%', '')) / 100;
-        total_time = parseFloat(parts[3].replace('ms', ''));
-        hits = parts.length === 5 && parts[4] !== '-' ? parseInt(parts[4]) : null;
-        average = null;
-      } catch (e) {
-        throw new Error(`Error parsing line:\n${line} - \n${e}`);
-      }
-
-      if (num_spaces === 0) {
-        parent_index = null;
-        stack.length = 0;
-      } else if (num_spaces > stack[stack.length - 1][0]) {
-        parent_index = stack[stack.length - 1][1];
-      } else {
-        while (stack.length && stack[stack.length - 1][0] >= num_spaces) {
-          stack.pop();
-        }
-
-        if (stack.length) {
-          parent_index = stack[stack.length - 1][1];
-        }
-      }
-
-      stack.push([num_spaces, i]);
-      return [operation, root_pct, parent_pct, other_pct, total_time, hits, average, parent_index, i];
     } else {
-      return null;
+      // Two unknowns in a row, keep same indentation
+      if (stack[stack.length - 1][2] === '(Unknown)') {
+        stack.pop();
+      }
+
+      // Unknown operation automatically indents one
+      parent_index = stack[stack.length - 1][1];
+      num_spaces = stack[stack.length - 1][0] + 2;
     }
+
+    stack.push([num_spaces, i, operation, parent_index]);
+
+    return [operation, root_pct, parent_pct, other_pct, total_time, hits, average, parent_index, i];
   } catch (e) {
     const operation = line.split(/\s{2,}/)[0];
     throw new Error(`Line ${i}:
@@ -89,7 +67,11 @@ ${e.message}
 Operation: ${operation}
 
 line:
-${line}`);
+${line}
+
+
+stack:
+${e.stack}`);
   }
 }
 
@@ -113,15 +95,21 @@ function _handle_missing_operation(line, stack, i, parts) {
 
   let parent_index, num_spaces;
 
+  const [prev_num_spaces, prev_index, prev_operation_name, prev_parent_index] = stack[stack.length - 1];
+
   if (!stack.length) {
     parent_index = null;
     num_spaces = 0;
+  } else if (prev_operation_name === '') {
+    // If two rows in a row have no operation, all we can do is give up and put it on the same level as the last one
+    num_spaces = prev_num_spaces;
+    parent_index = prev_parent_index;
   } else {
-    num_spaces = stack[stack.length - 1][0] + 2;
-    parent_index = stack[stack.length - 1][1];
+    num_spaces = prev_num_spaces + 2;
+    parent_index = prev_index;
   }
 
-  stack.push([num_spaces, i]);
+  stack.push([num_spaces, i, '', parent_index]);
   return ['(Unknown)', root_pct, parent_pct, other_pct, total_time, hits, average, parent_index, i];
 }
 
