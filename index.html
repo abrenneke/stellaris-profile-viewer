@@ -1,7 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Stellaris Profile Viewer</title>
+    <meta name="description"
+        content="View Stellaris script profiling log files in a user-friendly and organized manner with Stellaris Profile Viewer. Simply upload your log file and wait for the tool to generate a breakdown of your code's performance, including detailed statistics on execution time, parent-child relationships, and more.">
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
     <link href="./index.css" rel="stylesheet">
@@ -9,16 +15,38 @@
 </head>
 
 <body>
-    <div id="container">
-        <div id="entry-container">
-            <h1>Stellaris Profile Viewer</h1>
-            <p>This tool will help you view
-                <span class="mono">script_profiling.log</span> files. To get started, simply select your log file using
-                the button below and wait.
-            </p>
-            <label for="file">Select File</label>
-            <input type="file" id="file">
-            <p>This process is entirely client-side.</p>
+    <div id="wrapper">
+        <div id="container">
+            <div id="table-container"></div>
+            <div id="entry-container">
+                <h1>Stellaris Profile Viewer</h1>
+                <p>This tool will help you view
+                    <span class="mono">script_profiling.log</span> files. To get started, simply select your log file
+                    using
+                    the button below and wait.
+                </p>
+                <label class="button" for="file">Select File</label>
+                <input type="file" id="file">
+                <p>This process is entirely client-side.</p>
+            </div>
+            <div id="error-container">
+                <div class="error-message-container">
+                    <h2>Error</h2>
+                    <p id="error-message">There was an error parsing the log file. Please make sure the file is in the
+                        correct format and try again.</p>
+                </div>
+                <div id="try-again-container">
+                    <button class="button" id="try-again">Try Again</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="footer">
+            <div class="disclaimer">
+                <p>Full disclosure, this app was created for fun with assistance from ChatGPT, an AI language model
+                    developed by
+                    OpenAI.</p>
+            </div>
         </div>
     </div>
 </body>

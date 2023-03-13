@@ -11,18 +11,43 @@ input.addEventListener('change', function () {
     const reader = new FileReader();
 
     reader.onload = function () {
+        document.getElementById("error-container").style.display = 'none';
         const input_text = reader.result;
 
         const lines = input_text.replace(/\r\n/g, '\n').trim().split('\n').slice(1, -2);
 
-        const data = parse_profiling(lines);
-        const nested_data = build_tree(data);
+        try {
+            const data = parse_profiling(lines);
 
-        document.getElementById('entry-container').remove();
-        renderTable(document.getElementById('container'), nested_data.slice(0, 100));
+            if (data.length === 0) {
+                throw new Error(`Failed to parse, 0 profiling lines were extracted.`);
+            }
+
+            const nested_data = build_tree(data);
+
+            document.getElementById('entry-container').style.display = 'none';
+            renderTable(document.getElementById('container'), nested_data.slice(0, 100));
+        } catch (err) {
+            document.getElementById('entry-container').style.display = 'none';
+            showError(err.message);
+        }
     };
 
     reader.readAsText(file);
 });
+
+const tryAgainButton = document.getElementById('try-again');
+
+tryAgainButton.addEventListener('click', function () {
+    input.click();
+});
+
+
+function showError(message) {
+    const errorContainer = document.getElementById("error-container");
+    const errorText = document.getElementById('error-message')
+    errorText.innerText = message;
+    errorContainer.style.display = "block";
+}
 
 document.body.appendChild(input);
