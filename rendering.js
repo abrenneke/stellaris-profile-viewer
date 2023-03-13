@@ -51,8 +51,8 @@ export function renderRow(data, parentName = '') {
   const operationCol = document.createElement('div');
   operationCol.classList.add('operation-col');
   operationCol.innerText = data.operation;
-  if (data.root_pct < 1.0 && data.parent_pct !== 1.0) {
-    const dimness = 0.15 + 0.85 * data.root_pct;
+  if (!isRoot && data.parent_pct !== 1.0) {
+    const dimness = 0.15 + 0.85 * data.parent_pct;
     operationCol.style.color = `rgba(255,255,255,${dimness})`;
   }
 
