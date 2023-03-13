@@ -27,6 +27,8 @@ input.addEventListener('change', function () {
 
             document.getElementById('entry-container').style.display = 'none';
             renderTable(document.getElementById('container'), nested_data.slice(0, 100));
+
+            document.getElementById('toolbar-select-file-button').style.display = 'flex';
         } catch (err) {
             document.getElementById('entry-container').style.display = 'none';
             showError(err.message);
@@ -40,8 +42,8 @@ const tryAgainButton = document.getElementById('try-again');
 
 tryAgainButton.addEventListener('click', function () {
     input.click();
+    document.getElementById('toolbar-select-file-button').style.display = 'none';
 });
-
 
 function showError(message) {
     const errorContainer = document.getElementById("error-container");
@@ -49,5 +51,3 @@ function showError(message) {
     errorText.innerText = message;
     errorContainer.style.display = "block";
 }
-
-document.body.appendChild(input);
