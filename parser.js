@@ -1,76 +1,95 @@
 function parse_line(line, stack, i) {
-  const match = line.match(/^(\s*)(.+)$/);
-  if (!match) {
-    throw new Error(line);
-  }
-
-  const num_spaces = match[1].length;
-  line = match[2].trim();
-
-  let parent_index = null;
-
-  if (line) {
-    let parts = line
-      .split(' ')
-      .map((part) => part.trim())
-      .filter((part) => part);
-
-    if (parts.length < 6) {
-      if (!parts.length) {
-        return null;
-      }
-
-      return _handle_missing_operation(line, stack, i, parts);
+  try {
+    const match = line.match(/^(\s*)(.+)$/);
+    if (!match) {
+      throw new Error(`Unable to parse line:\n${line}`);
     }
 
-    let [operation] = line.split(/\s{2,}/);
-    parts = line
-      .slice(operation.length)
-      .split(/\s+/g)
-      .map((part) => part.trim())
-      .filter((part) => part);
+    const num_spaces = match[1].length;
+    line = match[2].trim();
 
-    let root_pct = NaN;
-    let parent_pct = NaN;
-    let other_pct = NaN;
-    let total_time = NaN;
-    let hits = NaN;
-    let average = NaN;
+    let parent_index = null;
 
-    try {
-      if (operation.replace('.', '').match(/^\d+$/) || operation.replace('%', '').replace('.', '').match(/^\d+$/)) {
-        throw new Error(`Invalid operation name: ${operation}`);
+    if (line) {
+      let parts = line
+        .split(' ')
+        .map((part) => part.trim())
+        .filter((part) => part);
+
+      if (parts.length < 4 || parts.length > 6) {
+        throw new Error(`Expected 4, 5, or 6 parts, got ${parts.length}:\n${JSON.stringify(parts)}`);
       }
 
-      root_pct = parseFloat(parts[0].replace('%', '')) / 100;
-      parent_pct = parseFloat(parts[1].replace('%', '')) / 100;
-      other_pct = parseFloat(parts[2].replace('%', '')) / 100;
-      total_time = parseFloat(parts[3].replace('ms', ''));
-      hits = parts.length > 4 && parts[4] !== '-' ? parseInt(parts[4]) : null;
-      average = null;
-    } catch (e) {
-      throw new Error(`Error parsing line: ${line} - ${e}`);
-    }
+      if (parts.length < 6) {
+        if (!parts.length) {
+          return null;
+        }
 
-    if (num_spaces === 0) {
-      parent_index = null;
-      stack.length = 0;
-    } else if (num_spaces > stack[stack.length - 1][0]) {
-      parent_index = stack[stack.length - 1][1];
-    } else {
-      while (stack.length && stack[stack.length - 1][0] >= num_spaces) {
-        stack.pop();
+        return _handle_missing_operation(line, stack, i, parts);
       }
 
-      if (stack.length) {
+      let [operation] = line.split(/\s{2,}/);
+      parts = line
+        .slice(operation.length)
+        .split(/\s+/g)
+        .map((part) => part.trim())
+        .filter((part) => part);
+
+      if (parts.length !== 4 && parts.length !== 5) {
+        throw new Error(`Expected 4 or 5 parts, got ${parts.length}:\n${JSON.stringify(parts)}`);
+      }
+
+      let root_pct = NaN;
+      let parent_pct = NaN;
+      let other_pct = NaN;
+      let total_time = NaN;
+      let hits = NaN;
+      let average = NaN;
+
+      try {
+        if (operation.replace('.', '').match(/^\d+$/) || operation.replace('%', '').replace('.', '').match(/^\d+$/)) {
+          throw new Error(`Invalid operation name: ${operation}`);
+        }
+
+        root_pct = parseFloat(parts[0].replace('%', '')) / 100;
+        parent_pct = parseFloat(parts[1].replace('%', '')) / 100;
+        other_pct = parseFloat(parts[2].replace('%', '')) / 100;
+        total_time = parseFloat(parts[3].replace('ms', ''));
+        hits = parts.length === 5 && parts[4] !== '-' ? parseInt(parts[4]) : null;
+        average = null;
+      } catch (e) {
+        throw new Error(`Error parsing line:\n${line} - \n${e}`);
+      }
+
+      if (num_spaces === 0) {
+        parent_index = null;
+        stack.length = 0;
+      } else if (num_spaces > stack[stack.length - 1][0]) {
         parent_index = stack[stack.length - 1][1];
-      }
-    }
+      } else {
+        while (stack.length && stack[stack.length - 1][0] >= num_spaces) {
+          stack.pop();
+        }
 
-    stack.push([num_spaces, i]);
-    return [operation, root_pct, parent_pct, other_pct, total_time, hits, average, parent_index, i];
-  } else {
-    return null;
+        if (stack.length) {
+          parent_index = stack[stack.length - 1][1];
+        }
+      }
+
+      stack.push([num_spaces, i]);
+      return [operation, root_pct, parent_pct, other_pct, total_time, hits, average, parent_index, i];
+    } else {
+      return null;
+    }
+  } catch (e) {
+    const operation = line.split(/\s{2,}/)[0];
+    throw new Error(`Line ${i}:
+${e.message}
+
+Operation: ${operation}
+
+line:
+${line}`);
   }
 }
 
@@ -89,7 +108,7 @@ function _handle_missing_operation(line, stack, i, parts) {
     hits = parts.length > 4 && parts[4] !== '-' ? parseInt(parts[4]) : null;
     average = null;
   } catch (e) {
-    throw new Error(`Error parsing line: ${line} - ${e}`);
+    throw new Error(`Error parsing line:\n${line} - \n${e}`);
   }
 
   let parent_index, num_spaces;
@@ -113,6 +132,10 @@ function parse_profiling(lines, maxRoots = Number.MAX_SAFE_INTEGER) {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    if (!line.trim()) {
+      continue;
+    }
+
     const line_data = parse_line(line, stack, i);
 
     if (line_data !== null) {
@@ -127,7 +150,7 @@ function parse_profiling(lines, maxRoots = Number.MAX_SAFE_INTEGER) {
 
         data.push(line_data);
       } else {
-        console.error(`Line ${i} data length is ${line_data.length}: ${line_data}`);
+        console.error(`Line ${i}: Data length is ${line_data.length}: ${line_data}`);
         process.exit(1);
       }
     }

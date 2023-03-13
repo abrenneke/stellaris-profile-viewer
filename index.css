@@ -29,6 +29,16 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--button-border-hover);
+  text-decoration: none;
+}
+
 #container {
   font-family: 'Roboto Mono', monospace;
   font-size: 14px;
@@ -211,7 +221,9 @@ body {
   position: relative;
   margin: 20px auto;
   text-align: center;
-  max-width: 600px;
+  max-width: calc(100% - 80px);
+  flex-direction: column;
+  align-items: center;
 }
 
 .error-message-container {
@@ -224,12 +236,13 @@ body {
   margin-bottom: 20px;
 }
 
-#error-container p {
+#error-container pre {
   color: #fff;
   margin: 0;
-  font-size: 1.2em;
   margin-top: 30px;
   line-height: 1.4em;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 12px;
 }
 
 #error-container h2 {
@@ -396,4 +409,8 @@ kbd {
   100% {
     transform: rotate(360deg);
   }
+}
+
+#help {
+  max-width: 600px;
 }

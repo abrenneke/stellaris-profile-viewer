@@ -66,5 +66,5 @@ function showError(message) {
   const errorContainer = document.getElementById('error-container');
   const errorText = document.getElementById('error-message');
   errorText.innerText = message;
-  errorContainer.style.display = 'block';
+  errorContainer.style.display = 'flex';
 }
