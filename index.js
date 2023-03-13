@@ -1,64 +1,62 @@
-import { renderTable } from './rendering.js';
-import { build_tree, parse_profiling } from './parser.js';
+import { renderTable } from "./rendering.js";
+
+// index.js
 
 const input = document.getElementById("file");
-const rootItemsDropdown = document.getElementById('root-items-select');
-input.type = 'file';
-input.accept = '.log';
+const rootItemsDropdown = document.getElementById("root-items-select");
+input.type = "file";
+input.accept = ".log";
 
-let root_items = parseInt(rootItemsDropdown.value, 10);
-let lines = [];
+let rootItems = parseInt(rootItemsDropdown.value, 10);
+let inputText = "";
+
+// Create a new worker
+const worker = new Worker("worker.js");
 
 // Handle file selection
-input.addEventListener('change', function () {
-    const file = input.files[0];
+input.addEventListener("change", function () {
+  const file = input.files[0];
 
-    const reader = new FileReader();
+  const reader = new FileReader();
 
-    reader.onload = function () {
-        document.getElementById("error-container").style.display = 'none';
-        const input_text = reader.result;
+  reader.onload = function () {
+    document.getElementById("error-container").style.display = "none";
+    inputText = reader.result;
 
-        lines = input_text.replace(/\r\n/g, '\n').trim().split('\n').slice(1, -2);
+    worker.postMessage({ inputText, rootItems });
 
-        try {
-            if (lines.length === 0) {
-                throw new Error(`Failed to parse, 0 profiling lines were extracted.`);
-            }
+    document.getElementById("entry-container").style.display = "none";
+    document.getElementById("toolbar-select-file-button").style.display =
+      "flex";
+  };
 
-            const data = parse_profiling(lines, root_items);
-            const nested_data = build_tree(data);
-            renderTable(document.getElementById('table-container'), nested_data.slice(0, root_items));
-
-            document.getElementById('entry-container').style.display = 'none';
-            document.getElementById('toolbar-select-file-button').style.display = 'flex';
-        } catch (err) {
-            document.getElementById('entry-container').style.display = 'none';
-            showError(err.message);
-        }
-    };
-
-    reader.readAsText(file);
+  reader.readAsText(file);
 });
 
-rootItemsDropdown.addEventListener('change', function () {
-    root_items = parseInt(this.value, 10);
-    const data = parse_profiling(lines, root_items);
-    const nested_data = build_tree(data);
-    renderTable(document.getElementById('table-container'), nested_data.slice(0, root_items));
+// Listen for messages from the worker
+worker.addEventListener("message", (event) => {
+  if (event.data.type === "SUCCESS") {
+    renderTable(document.getElementById("table-container"), event.data.data);
+  } else if (event.data.type === "ERROR") {
+    showError(event.data.message);
+  }
 });
 
+rootItemsDropdown.addEventListener("change", function () {
+  rootItems = parseInt(this.value, 10);
+  worker.postMessage({ inputText, rootItems });
+});
 
-const tryAgainButton = document.getElementById('try-again');
+const tryAgainButton = document.getElementById("try-again");
 
-tryAgainButton.addEventListener('click', function () {
-    input.click();
-    document.getElementById('toolbar-select-file-button').style.display = 'none';
+tryAgainButton.addEventListener("click", function () {
+  input.click();
+  document.getElementById("toolbar-select-file-button").style.display = "none";
 });
 
 function showError(message) {
-    const errorContainer = document.getElementById("error-container");
-    const errorText = document.getElementById('error-message')
-    errorText.innerText = message;
-    errorContainer.style.display = "block";
+  const errorContainer = document.getElementById("error-container");
+  const errorText = document.getElementById("error-message");
+  errorText.innerText = message;
+  errorContainer.style.display = "block";
 }
