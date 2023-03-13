@@ -102,9 +102,10 @@ function _handle_missing_operation(line, stack, i, parts) {
     return ['(Unknown)', root_pct, parent_pct, other_pct, total_time, hits, average, parent_index, i];
 }
 
-export function parse_profiling(lines) {
+export function parse_profiling(lines, maxRoots = Number.MAX_SAFE_INTEGER) {
     const data = [];
     const stack = [];
+    let foundRoots = 0;
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -112,6 +113,14 @@ export function parse_profiling(lines) {
 
         if (line_data !== null) {
             if (line_data.length === 9) {
+                if (line_data[7] === null) {
+                    foundRoots++;
+                }
+
+                if (foundRoots > maxRoots) {
+                    break;
+                }
+
                 data.push(line_data);
             } else {
                 console.error(`Line ${i} data length is ${line_data.length}: ${line_data}`);
