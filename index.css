@@ -364,18 +364,36 @@ kbd {
   margin: 0 auto;
 }
 
+/* styles.css */
+
+#spinner-container {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
 .spinner {
-  display: inline-block;
-  width: 32px;
-  height: 32px;
+  border-top: 10px solid var(--button-bg);
+  border-right: 10px solid var(--button-bg);
+  border-bottom: 10px solid var(--button-bg);
+  border-left: 10px solid var(--button-border);
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
-  border: 4px solid #ccc;
-  border-top-color: #49c;
-  animation: spin 1s ease-in-out infinite;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  to {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
     transform: rotate(360deg);
   }
 }

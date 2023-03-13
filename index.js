@@ -1,11 +1,9 @@
-import { renderTable } from './rendering.js';
-
-// index.js
+import { renderTable, handleClick } from './rendering.js';
 
 const input = document.getElementById('file');
 const rootItemsDropdown = document.getElementById('root-items-select');
-input.type = 'file';
-input.accept = '.log';
+const spinner = document.getElementById('spinner-container');
+const tableContainer = document.getElementById('table-container');
 
 let rootItems = parseInt(rootItemsDropdown.value, 10);
 let inputText = '';
@@ -13,7 +11,20 @@ let inputText = '';
 // Create a new worker
 const worker = new Worker('worker.js');
 
-// Handle file selection
+function render() {
+  while (tableContainer.firstChild) {
+    tableContainer.removeChild(tableContainer.lastChild);
+  }
+
+  worker.postMessage({ inputText, rootItems });
+  spinner.style.display = 'flex';
+
+  document.getElementById('entry-container').style.display = 'none';
+  document.getElementById('toolbar-select-file-button').style.display = 'flex';
+}
+
+tableContainer.addEventListener('click', handleClick);
+
 input.addEventListener('change', function () {
   const file = input.files[0];
 
@@ -23,10 +34,7 @@ input.addEventListener('change', function () {
     document.getElementById('error-container').style.display = 'none';
     inputText = reader.result;
 
-    worker.postMessage({ inputText, rootItems });
-
-    document.getElementById('entry-container').style.display = 'none';
-    document.getElementById('toolbar-select-file-button').style.display = 'flex';
+    render();
   };
 
   reader.readAsText(file);
@@ -34,8 +42,9 @@ input.addEventListener('change', function () {
 
 // Listen for messages from the worker
 worker.addEventListener('message', (event) => {
+  spinner.style.display = 'none';
   if (event.data.type === 'SUCCESS') {
-    renderTable(document.getElementById('table-container'), event.data.data);
+    renderTable(tableContainer, event.data.data);
   } else if (event.data.type === 'ERROR') {
     showError(event.data.message);
   }
@@ -43,7 +52,7 @@ worker.addEventListener('message', (event) => {
 
 rootItemsDropdown.addEventListener('change', function () {
   rootItems = parseInt(this.value, 10);
-  worker.postMessage({ inputText, rootItems });
+  render();
 });
 
 const tryAgainButton = document.getElementById('try-again');

@@ -118,7 +118,7 @@ export function renderRow(data, parentName = '') {
   return row;
 }
 
-function handleClick(event) {
+export function handleClick(event) {
   const row = event.target.closest('.table-row');
   if (!row) {
     return;
@@ -147,14 +147,6 @@ function toggleRow(row) {
 }
 
 export function renderTable(container, data) {
-  container.addEventListener('click', handleClick);
-
-  // Clear container
-  while (container.firstChild) {
-    container.removeChild(container.lastChild);
-  }
-
-  // Render rows
   for (let i = 0; i < data.length; i++) {
     const rowData = data[i];
     const rowNode = renderRow(rowData);
