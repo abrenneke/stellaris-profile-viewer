@@ -11,7 +11,7 @@ function parse_line(line, stack, i) {
 
   if (line) {
     let parts = line
-      .split(" ")
+      .split(' ')
       .map((part) => part.trim())
       .filter((part) => part);
 
@@ -38,18 +38,15 @@ function parse_line(line, stack, i) {
     let average = NaN;
 
     try {
-      if (
-        operation.replace(".", "").match(/^\d+$/) ||
-        operation.replace("%", "").replace(".", "").match(/^\d+$/)
-      ) {
+      if (operation.replace('.', '').match(/^\d+$/) || operation.replace('%', '').replace('.', '').match(/^\d+$/)) {
         throw new Error(`Invalid operation name: ${operation}`);
       }
 
-      root_pct = parseFloat(parts[0].replace("%", "")) / 100;
-      parent_pct = parseFloat(parts[1].replace("%", "")) / 100;
-      other_pct = parseFloat(parts[2].replace("%", "")) / 100;
-      total_time = parseFloat(parts[3].replace("ms", ""));
-      hits = parts.length > 4 && parts[4] !== "-" ? parseInt(parts[4]) : null;
+      root_pct = parseFloat(parts[0].replace('%', '')) / 100;
+      parent_pct = parseFloat(parts[1].replace('%', '')) / 100;
+      other_pct = parseFloat(parts[2].replace('%', '')) / 100;
+      total_time = parseFloat(parts[3].replace('ms', ''));
+      hits = parts.length > 4 && parts[4] !== '-' ? parseInt(parts[4]) : null;
       average = null;
     } catch (e) {
       throw new Error(`Error parsing line: ${line} - ${e}`);
@@ -71,17 +68,7 @@ function parse_line(line, stack, i) {
     }
 
     stack.push([num_spaces, i]);
-    return [
-      operation,
-      root_pct,
-      parent_pct,
-      other_pct,
-      total_time,
-      hits,
-      average,
-      parent_index,
-      i,
-    ];
+    return [operation, root_pct, parent_pct, other_pct, total_time, hits, average, parent_index, i];
   } else {
     return null;
   }
@@ -95,11 +82,11 @@ function _handle_missing_operation(line, stack, i, parts) {
   let hits = NaN;
   let average = NaN;
   try {
-    root_pct = parseFloat(parts[0].replace("%", "")) / 100;
-    parent_pct = parseFloat(parts[1].replace("%", "")) / 100;
-    other_pct = parseFloat(parts[2].replace("%", "")) / 100;
-    total_time = parseFloat(parts[3].replace("ms", ""));
-    hits = parts.length > 4 && parts[4] !== "-" ? parseInt(parts[4]) : null;
+    root_pct = parseFloat(parts[0].replace('%', '')) / 100;
+    parent_pct = parseFloat(parts[1].replace('%', '')) / 100;
+    other_pct = parseFloat(parts[2].replace('%', '')) / 100;
+    total_time = parseFloat(parts[3].replace('ms', ''));
+    hits = parts.length > 4 && parts[4] !== '-' ? parseInt(parts[4]) : null;
     average = null;
   } catch (e) {
     throw new Error(`Error parsing line: ${line} - ${e}`);
@@ -116,17 +103,7 @@ function _handle_missing_operation(line, stack, i, parts) {
   }
 
   stack.push([num_spaces, i]);
-  return [
-    "(Unknown)",
-    root_pct,
-    parent_pct,
-    other_pct,
-    total_time,
-    hits,
-    average,
-    parent_index,
-    i,
-  ];
+  return ['(Unknown)', root_pct, parent_pct, other_pct, total_time, hits, average, parent_index, i];
 }
 
 function parse_profiling(lines, maxRoots = Number.MAX_SAFE_INTEGER) {
@@ -150,9 +127,7 @@ function parse_profiling(lines, maxRoots = Number.MAX_SAFE_INTEGER) {
 
         data.push(line_data);
       } else {
-        console.error(
-          `Line ${i} data length is ${line_data.length}: ${line_data}`
-        );
+        console.error(`Line ${i} data length is ${line_data.length}: ${line_data}`);
         process.exit(1);
       }
     }
