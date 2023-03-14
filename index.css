@@ -279,6 +279,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
+  gap: 8px;
 }
 
 .button:hover {
@@ -413,4 +415,12 @@ kbd {
 
 #help {
   max-width: 600px;
+}
+
+#export-json-button {
+  display: none;
+}
+
+#export-nested-json-button {
+  display: none;
 }

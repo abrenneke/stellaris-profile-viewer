@@ -31,7 +31,7 @@ function parse_line(line, stack, i) {
     other_pct = parseFloat(other_pct_str.replace('%', '')) / 100;
     total_time = parseFloat(total_time_str.replace('ms', ''));
     hits = parseInt(hits_str);
-    average = average_str ? parseFloat(average_str) : null;
+    average = average_str ? parseFloat(average_str) : total_time / hits;
 
     // Handle stack
     let parent_index = null;
@@ -73,44 +73,6 @@ ${line}
 stack:
 ${e.stack}`);
   }
-}
-
-function _handle_missing_operation(line, stack, i, parts) {
-  let root_pct = NaN;
-  let parent_pct = NaN;
-  let other_pct = NaN;
-  let total_time = NaN;
-  let hits = NaN;
-  let average = NaN;
-  try {
-    root_pct = parseFloat(parts[0].replace('%', '')) / 100;
-    parent_pct = parseFloat(parts[1].replace('%', '')) / 100;
-    other_pct = parseFloat(parts[2].replace('%', '')) / 100;
-    total_time = parseFloat(parts[3].replace('ms', ''));
-    hits = parts.length > 4 && parts[4] !== '-' ? parseInt(parts[4]) : null;
-    average = null;
-  } catch (e) {
-    throw new Error(`Error parsing line:\n${line} - \n${e}`);
-  }
-
-  let parent_index, num_spaces;
-
-  const [prev_num_spaces, prev_index, prev_operation_name, prev_parent_index] = stack[stack.length - 1];
-
-  if (!stack.length) {
-    parent_index = null;
-    num_spaces = 0;
-  } else if (prev_operation_name === '') {
-    // If two rows in a row have no operation, all we can do is give up and put it on the same level as the last one
-    num_spaces = prev_num_spaces;
-    parent_index = prev_parent_index;
-  } else {
-    num_spaces = prev_num_spaces + 2;
-    parent_index = prev_index;
-  }
-
-  stack.push([num_spaces, i, '', parent_index]);
-  return ['(Unknown)', root_pct, parent_pct, other_pct, total_time, hits, average, parent_index, i];
 }
 
 function parse_profiling(lines, maxRoots = Number.MAX_SAFE_INTEGER) {
