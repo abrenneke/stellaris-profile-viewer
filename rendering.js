@@ -100,7 +100,7 @@ export function renderRow(data, parentName = '') {
 
   const indicator = document.createElement('span');
   indicator.classList.add('indicator');
-  indicator.innerText = data.children ? '' : '';
+  indicator.style.display = data.children?.length ? 'inline-block' : 'none';
 
   dataContainer.appendChild(indicator);
   dataContainer.appendChild(operationCol);
