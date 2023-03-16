@@ -8,12 +8,14 @@
   --accent-color: #3d6f4f;
   --accent-dark-color: #2c4d37;
   --text-color: #e1e1e1;
-  --text-muted-color: #555;
+  --muted-text-color: #8e9a91;
+  --disclaimer-color: #555;
   --error-color-bg: rgba(255, 51, 51, 0.2);
   --error-color-border: rgba(255, 51, 51, 0.5);
   --button-bg: rgba(75, 130, 94, 0.2);
+  --button-bg-opaque: rgb(24, 43, 31);
   --button-bg-hover: rgba(255, 165, 0, 0.2);
-  --button-border: rgba(75, 130, 94, 0.5);
+  --button-border: rgba(50, 88, 64, 0.5);
   --button-border-hover: rgba(255, 165, 0, 0.5);
   --button-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
   --ui-panel-border: rgba(61, 111, 79, 0.3);
@@ -210,7 +212,7 @@ body {
 
 .disclaimer {
   font-size: 9px;
-  color: var(--text-muted-color);
+  color: var(--disclaimer-color);
   text-align: center;
   margin-top: auto;
   padding: 10px 0;
@@ -272,7 +274,6 @@ body {
   border-radius: 0;
   box-shadow: var(--button-shadow);
   max-width: 200px;
-  margin: 0 auto;
   color: #fff;
   font-family: sans-serif;
   text-shadow: 1px 1px 1px #000;
@@ -281,6 +282,7 @@ body {
   justify-content: center;
   white-space: nowrap;
   gap: 8px;
+  margin: 0;
 }
 
 .button:hover {
@@ -307,16 +309,65 @@ body {
   display: flex;
   align-items: center;
   gap: 16px;
+  flex: 1;
+  justify-content: flex-start;
+}
+
+#center-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+  justify-content: center;
 }
 
 #right-toolbar {
   display: flex;
   align-items: center;
   gap: 16px;
+  flex: 1;
+  justify-content: flex-end;
 }
 
 #right-toolbar img {
   height: 30px;
+}
+
+.toolbar-statistic {
+  display: none;
+  /* display: flex; */
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+}
+
+.toolbar-statistic span:first-of-type {
+  color: var(--muted-text-color);
+  font-size: 0.8em;
+  margin-bottom: 4px;
+
+}
+
+.toolbar-statistic span:last-of-type {
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.toolbar-statistic .tooltip {
+  position: absolute;
+  display: none;
+  top: 75%;
+  left: 150%;
+  transform: translateX(-50%);
+  background-color: var(--button-bg-opaque);
+  border: 1px solid var(--accent-dark-color);
+  color: #fff;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+}
+
+.toolbar-statistic:hover .tooltip {
+  display: flex;
 }
 
 #how-to-profile-section {
@@ -377,6 +428,15 @@ kbd {
 #select-file-section {
   max-width: 600px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#select-file-section .button {
+	width: 300px;
+	height: 48px;
+	max-width: unset;
 }
 
 /* styles.css */

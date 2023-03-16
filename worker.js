@@ -14,16 +14,21 @@ self.addEventListener('message', (event) => {
       throw new Error(`Failed to parse, 0 profiling lines were extracted.`);
     }
 
-    const data = parse_profiling(lines, rootItems);
+    const { data, numRoots, numEntries, totalTime } = parse_profiling(lines, rootItems);
+
     self.postMessage({
       type: 'PARSING_SUCCESS',
       data: data.slice(0, rootItems),
+      numRoots,
+      numEntries,
+      totalTime
     });
 
     const nested_data = build_tree(data);
+
     self.postMessage({
       type: 'BUILDING_TREE_SUCCESS',
-      data: nested_data.slice(0, rootItems),
+      data: nested_data.slice(0, rootItems)
     });
 
     if (render) {

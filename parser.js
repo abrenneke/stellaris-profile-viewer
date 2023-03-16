@@ -79,6 +79,8 @@ function parse_profiling(lines, maxRoots = Number.MAX_SAFE_INTEGER) {
   const data = [];
   const stack = [];
   let foundRoots = 0;
+  let numEntries = 0;
+  let totalTime = 0;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -90,12 +92,15 @@ function parse_profiling(lines, maxRoots = Number.MAX_SAFE_INTEGER) {
 
     if (line_data !== null) {
       if (line_data.length === 9) {
-        if (line_data[7] === null) {
+        numEntries++;
+
+        if (line_data[7] === null) { // is root
           foundRoots++;
+          totalTime += line_data[4];
         }
 
         if (foundRoots > maxRoots) {
-          break;
+          continue;
         }
 
         data.push(line_data);
@@ -106,7 +111,7 @@ function parse_profiling(lines, maxRoots = Number.MAX_SAFE_INTEGER) {
     }
   }
 
-  return data;
+  return { data, numRoots: foundRoots, numEntries, totalTime };
 }
 
 function build_tree(data) {

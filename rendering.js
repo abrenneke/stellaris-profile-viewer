@@ -28,8 +28,7 @@ function formatTime(ms) {
   } else if (ms < 1000) {
     return `${ms.toFixed(0)}ms`;
   } else if (ms < 60 * 1000) {
-    const seconds = Math.floor(ms / 1000);
-    return `${seconds.toFixed(2)}s`;
+    return `${(ms / 1000).toFixed(2)}s`;
   } else {
     const minutes = Math.floor(ms / (60 * 1000));
     const seconds = Math.floor((ms % (60 * 1000)) / 1000);
@@ -146,10 +145,31 @@ function toggleRow(row) {
   }
 }
 
-export function renderTable(container, data) {
+const toolbarStatistics = document.querySelectorAll('.toolbar-statistic');
+
+export function showToolbarStatistics() {
+  for (let i = 0; i < toolbarStatistics.length; i++) {
+    toolbarStatistics[i].style.display = 'flex';
+  }
+}
+
+export function hideToolbarStatistics() {
+  for (let i = 0; i < toolbarStatistics.length; i++) {
+    toolbarStatistics[i].style.display = 'none';
+  }
+}
+
+export function renderTable(container, data, { totalRoots, totalEntries, totalTime }) {
   for (let i = 0; i < data.length; i++) {
     const rowData = data[i];
     const rowNode = renderRow(rowData);
     container.appendChild(rowNode);
   }
+
+  showToolbarStatistics();
+  document.getElementById('total-entries').textContent = totalEntries.toLocaleString();
+  document.getElementById('total-roots').textContent = totalRoots.toLocaleString();
+
+  document.getElementById('total-time').textContent = `${formatTime(totalTime)}`;
+  document.getElementById('total-time-tooltip').textContent = `${totalTime}ms`;
 }

@@ -49,6 +49,21 @@
               </select>
             </div>
           </div>
+          <div id="center-toolbar">
+            <div class="toolbar-statistic">
+              <span>Total Entries:</span>
+              <span id="total-entries">0</span>
+            </div>
+            <div class="toolbar-statistic">
+              <span>Total Roots:</span>
+              <span id="total-roots">0</span>
+            </div>
+            <div class="toolbar-statistic">
+              <span>Total Time:</span>
+              <span id="total-time">0ms</span>
+              <span class="tooltip" id="total-time-tooltip" class="tooltip"></span>
+            </div>
+          </div>
           <div id="right-toolbar">
             <button class="button" id="export-json-button"><i class="fas fa-download"></i> Export JSON</button>
             <button class="button" id="export-nested-json-button">
@@ -59,6 +74,7 @@
             </a>
           </div>
         </div>
+
         <div id="table-container"></div>
         <div id="spinner-container">
           <div class="spinner"></div>

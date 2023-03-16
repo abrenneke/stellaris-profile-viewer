@@ -1,4 +1,4 @@
-import { renderTable, handleClick } from './rendering.js';
+import { renderTable, handleClick, hideToolbarStatistics } from './rendering.js';
 
 const input = document.getElementById('file');
 const rootItemsDropdown = document.getElementById('root-items-select');
@@ -9,6 +9,9 @@ let rootItems = parseInt(rootItemsDropdown.value, 10);
 let inputText = '';
 let parsedData = [];
 let nestedData = [];
+let totalEntries = 0;
+let totalRoots = 0;
+let totalTime = 0;
 
 // Create a new worker
 const worker = new Worker('worker.js');
@@ -20,6 +23,7 @@ function render() {
 
   worker.postMessage({ inputText, rootItems, render: true });
   spinner.style.display = 'flex';
+  hideToolbarStatistics();
 
   document.getElementById('entry-container').style.display = 'none';
   document.getElementById('toolbar-select-file-button').style.display = 'flex';
@@ -49,11 +53,14 @@ input.addEventListener('change', function () {
 worker.addEventListener('message', (event) => {
   if (event.data.type === 'PARSING_SUCCESS') {
     parsedData = event.data.data;
+    totalRoots = event.data.numRoots;
+    totalEntries = event.data.numEntries,
+    totalTime = event.data.totalTime;
   } else if (event.data.type === 'BUILDING_TREE_SUCCESS') {
     nestedData = event.data.data;
   } else if (event.data.type === 'DO_RENDER') {
     spinner.style.display = 'none';
-    renderTable(tableContainer, nestedData);
+    renderTable(tableContainer, nestedData, { totalRoots, totalTime, totalEntries });
   } else if (event.data.type === 'ERROR') {
     showError(event.data.message);
   } else if (event.data.type === 'DOWNLOAD_READY') {
