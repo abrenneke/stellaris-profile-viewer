@@ -48,19 +48,24 @@
                 <option value="1000">1000</option>
               </select>
             </div>
+            <div class="toolbar-checkbox">
+              <input type="checkbox" id="show-other-percent-checkbox">
+              <label for="show-other-percent-checkbox">Other %</label>
+              <i class="fas fa-circle-question after-tooltip" data-tooltip="If you know what 'Other %' means, please let me know!"></i>
+            </div>
           </div>
           <div id="center-toolbar">
             <div class="toolbar-statistic">
               <span>Total Entries:</span>
-              <span id="total-entries">0</span>
+              <span id="total-entries" class="tooltip-value">0</span>
             </div>
             <div class="toolbar-statistic">
               <span>Total Roots:</span>
-              <span id="total-roots">0</span>
+              <span id="total-roots" class="tooltip-value">0</span>
             </div>
             <div class="toolbar-statistic">
               <span>Total Time:</span>
-              <span id="total-time">0ms</span>
+              <span id="total-time" class="tooltip-value">0ms</span>
               <span class="tooltip" id="total-time-tooltip" class="tooltip"></span>
             </div>
           </div>

@@ -20,6 +20,9 @@
   --button-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
   --ui-panel-border: rgba(61, 111, 79, 0.3);
   --ui-panel-bg: rgba(75, 130, 94, 0.06);
+
+  --sans-serif: 'Roboto', sans-serif;
+  --monospace: 'Roboto Mono', monospace;
 }
 
 html,
@@ -28,7 +31,7 @@ body {
   padding: 0;
   background-color: var(--background-color);
   color: var(--text-color);
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--sans-serif)
 }
 
 a {
@@ -42,7 +45,7 @@ a:hover {
 }
 
 #container {
-  font-family: 'Roboto Mono', monospace;
+  font-family: var(--monospace);
   font-size: 14px;
   color: var(--text-color);
   background-color: var(--background-color);
@@ -83,7 +86,7 @@ a:hover {
 .table-row .operation-col {
   text-align: left;
   flex-grow: 1;
-  font-family: 'Roboto Mono', monospace;
+  font-family: var(--monospace);
 }
 
 .header-row .operation-col {
@@ -113,7 +116,12 @@ a:hover {
 }
 
 .other-pct-col {
-  flex: 0 0 0;
+  display: none;
+  flex: 0 0 115px;
+}
+
+#table-container.show-other-pct .other-pct-col {
+  display: block;
 }
 
 .total-time-col {
@@ -171,7 +179,7 @@ a:hover {
 }
 
 .mono {
-  font-family: 'Roboto Mono', monospace;
+  font-family: --var(--monospace);
   background: #444;
 }
 
@@ -243,7 +251,7 @@ body {
   margin: 0;
   margin-top: 30px;
   line-height: 1.4em;
-  font-family: 'Roboto Mono', monospace;
+  font-family: var(--monospace);
   font-size: 12px;
 }
 
@@ -275,7 +283,7 @@ body {
   box-shadow: var(--button-shadow);
   max-width: 200px;
   color: #fff;
-  font-family: sans-serif;
+  font-family: var(--sans-serif);
   text-shadow: 1px 1px 1px #000;
   display: flex;
   align-items: center;
@@ -345,29 +353,64 @@ body {
   color: var(--muted-text-color);
   font-size: 0.8em;
   margin-bottom: 4px;
-
 }
 
-.toolbar-statistic span:last-of-type {
+.toolbar-statistic .tooltip-value {
   font-weight: bold;
   color: var(--text-color);
 }
 
-.toolbar-statistic .tooltip {
+.after-tooltip {
+  position: relative;
+}
+
+.tooltip, .after-tooltip::after {
   position: absolute;
   display: none;
-  top: 75%;
-  left: 150%;
-  transform: translateX(-50%);
+  top: 100%;
+  left: 0;
+  /* transform: translateX(-50%); */
   background-color: var(--button-bg-opaque);
   border: 1px solid var(--accent-dark-color);
   color: #fff;
-  padding: 4px 8px;
+  padding: 8px 16px;
   font-size: 0.8rem;
+  font-family: var(--sans-serif);
+  white-space: nowrap;
+  font-weight: normal;
+  z-index: 10;
 }
 
 .toolbar-statistic:hover .tooltip {
   display: flex;
+}
+
+.toolbar-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-checkbox input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.toolbar-checkbox label {
+  color: var(--text-color);
+  font-size: 0.8rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toolbar-checkbox i {
+  position: relative;
+  margin-left: 5px;
+  color: var(--muted-text-color);
+  cursor: help;
+}
+
+.toolbar-checkbox i[data-tooltip]:hover:after {
+  content: attr(data-tooltip);
+  display: block;
 }
 
 #how-to-profile-section {

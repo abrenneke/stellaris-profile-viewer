@@ -82,6 +82,12 @@ export function renderRow(data, parentName = '') {
     parentPctCol.style.whiteSpace = 'nowrap';
   }
 
+  const otherPctCol = document.createElement('div');
+  otherPctCol.classList.add('other-pct-col');
+  if (data.other_pct !== null) {
+      otherPctCol.innerText = `${(data.other_pct * 100).toLocaleString()}% other`;
+  }
+
   const totalTimeCol = document.createElement('div');
   totalTimeCol.classList.add('total-time-col');
   totalTimeCol.innerText = isRoot ? `${formatTime(data.total_time)} total` : formatTime(data.total_time);
@@ -105,7 +111,7 @@ export function renderRow(data, parentName = '') {
   dataContainer.appendChild(operationCol);
   dataContainer.appendChild(rootPctCol);
   dataContainer.appendChild(parentPctCol);
-  // dataContainer.appendChild(otherPctCol);
+  dataContainer.appendChild(otherPctCol);
   dataContainer.appendChild(totalTimeCol);
   dataContainer.appendChild(hitsCol);
   dataContainer.appendChild(averageCol);

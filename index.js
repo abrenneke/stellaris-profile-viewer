@@ -117,3 +117,15 @@ document.getElementById('export-nested-json-button').addEventListener('click', (
   // Trigger the worker to parse the input and prepare for download
   worker.postMessage({ inputText, rootItems, download, downloadType: 'nested', fileName });
 });
+
+const showOtherPctCheckbox = document.getElementById('show-other-percent-checkbox');
+function setShowOther() {
+    if (showOtherPctCheckbox.checked) {
+      tableContainer.classList.add('show-other-pct');
+    } else {
+      tableContainer.classList.remove('show-other-pct');
+    }
+}
+
+showOtherPctCheckbox.addEventListener('change', setShowOther);
+setShowOther();
